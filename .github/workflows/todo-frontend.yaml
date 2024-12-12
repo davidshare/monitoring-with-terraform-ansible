@@ -1,0 +1,32 @@
+name: Build Frontend Docker Image
+
+on:
+  push:
+    tags:
+      - "todo-frontend-*" # Trigger on tags that start with 'todo-frontend-'
+    branches:
+      - master
+    paths:
+      - "todo-frontend/**" # Trigger when there are changes in the 'frontend' directory
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image for frontend
+        run: |
+          docker build -t your-dockerhub-username/todo:frontend-${{ github.sha }} ./todo-frontend
+          docker push your-dockerhub-username/todo:frontend-${{ github.sha }}
