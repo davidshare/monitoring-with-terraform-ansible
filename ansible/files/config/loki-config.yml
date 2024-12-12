@@ -1,0 +1,44 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+
+common:
+  instance_addr: 127.0.0.1
+
+distributor:
+  ring:
+    kvstore:
+      store: inmemory
+    consistent_hash_ring:
+      num_tokens: 256
+
+ingester:
+  chunk_target_size: 1048576
+  max_chunk_age: 1h
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+
+querier:
+  query_timeout: 30s
+  max_concurrent: 50
+
+frontend:
+  log_queries_fully_completed: true
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /data/loki/index
+    cache_location: /data/loki/cache
+    storage_type: filesystem
+    directory: /data/loki/chunks
+
+limits_config:
+  max_entries_limit: 500000
+  max_chunk_size: 1048576
+
+chunk_target_size: 1048576

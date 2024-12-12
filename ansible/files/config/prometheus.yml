@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  # Monitor Prometheus itself
+  - job_name: "prometheus"
+    scrape_interval: 1m
+    metrics_path: "/prometheus/metrics"
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  # Monitor cAdvisor for container metrics
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+
+  # Monitor Node Exporter (if deployed)
+  - job_name: "node"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # Monitor Traefik for router/service metrics
+  - job_name: "traefik"
+    static_configs:
+      - targets: ["traefik:8082"]
+
+  # Monitor todo-api for application metrics
+  - job_name: "todo-api"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["todo-api:8000"]
+
+  # Monitor Grafana for metrics
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+
+  # Monitor Loki
+  - job_name: "loki"
+    static_configs:
+      - targets: ["loki:3100"]

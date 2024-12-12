@@ -1,0 +1,52 @@
+# Install Docker
+- name: Install Docker
+  yum:
+    name: docker
+    state: present
+
+- name: Start and enable Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ec2-user to Docker group
+  user:
+    name: ec2-user
+    groups: docker
+    append: yes
+
+# Fetch latest Docker Compose version
+- name: Get the latest Docker Compose version
+  uri:
+    url: https://api.github.com/repos/docker/compose/releases/latest
+    return_content: yes
+  register: compose_version
+
+- name: Set Docker Compose version
+  set_fact:
+    docker_compose_version: "{{ compose_version.json.tag_name }}"
+
+# Install Docker Compose
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: "0755"
+
+# Verify Docker and Docker Compose
+- name: Verify Docker installation
+  command: docker --version
+  register: docker_version
+
+- name: Print Docker version
+  debug:
+    msg: "Docker version: {{ docker_version.stdout }}"
+
+- name: Verify Docker Compose installation
+  command: docker-compose --version
+  register: docker_compose_output
+
+- name: Print Docker Compose version
+  debug:
+    msg: "Docker Compose version: {{ docker_compose_output.stdout }}"

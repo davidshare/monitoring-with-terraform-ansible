@@ -1,0 +1,61 @@
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+dist/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-lock.yaml
+
+# .env files (Add this if you're using environment variables)
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Log files
+logs/
+*.log
+
+# Python / FastAPI
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.eggs/
+dist/
+build/
+*.db
+
+# Virtual environment (if you use one)
+venv/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# Docker-related files (if applicable)
+*.pid
+
+# IDE/editor related files (you may need to adjust based on the tools you use)
+.vscode/
+.idea/
+
+# MacOS related files
+.DS_Store
+
+# Windows related files
+Thumbs.db
+
+# JetBrains IDE project files (for PyCharm, WebStorm, etc.)
+*.iml
+letsencrypt
+
+!next-env.d.ts
+
+.terraform*
+*.tfstate*

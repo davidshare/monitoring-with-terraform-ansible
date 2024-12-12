@@ -1,0 +1,77 @@
+include:
+  - ./db.compose.yaml
+  - ./monitoring.compose.yaml
+  - ./traefik.compose.yaml
+
+services:
+  todo-api:
+    image: davidshare/todo:todo-api
+    container_name: todo-api
+    ports:
+      - "8000:8000"
+    networks:
+      - apps
+    labels:
+      - "traefik.enable=true"
+
+      # HTTP Router - Redirect all HTTP traffic to HTTPS
+      - "traefik.http.routers.backend-http.rule=Host(`cv01.davidessien.com`) && (PathPrefix(`/api`) || PathPrefix(`/redoc`) || PathPrefix(`/docs`))"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+
+      # HTTPS Router
+      - "traefik.http.routers.backend-https.rule=Host(`cv01.davidessien.com`) && (PathPrefix(`/api`) || PathPrefix(`/redoc`) || PathPrefix(`/docs`))"
+      - "traefik.http.routers.backend-https.entrypoints=websecure"
+      - "traefik.http.routers.backend-https.tls.certresolver=production"
+
+      # Service
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.services.backend.loadbalancer.server.url=https://cv01.davidessien.com/api"
+    env_file:
+      - ./todo-api/.env
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').getcode()",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    depends_on:
+      - db
+
+  todo-frontend:
+    image: davidshare/todo:todo-frontend
+    container_name: todo-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - apps
+    labels:
+      - "traefik.enable=true"
+
+      # HTTP Router - Redirect HTTP to HTTPS
+      - "traefik.http.routers.frontend-http.rule=Host(`cv01.davidessien.com`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+
+      # HTTPS Router
+      - "traefik.http.routers.frontend-https.rule=Host(`cv01.davidessien.com`)"
+      - "traefik.http.routers.frontend-https.entrypoints=websecure"
+      - "traefik.http.routers.frontend-https.tls.certresolver=production"
+
+      # Service
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+    restart: unless-stopped
+
+networks:
+  apps:
+    name: apps
+    driver: bridge
+  monitoring:
+    name: monitoring
+    driver: bridge

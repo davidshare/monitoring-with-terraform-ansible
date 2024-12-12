@@ -1,0 +1,74 @@
+# Traefik Global Configuration
+api:
+  dashboard: true
+  insecure: false # Ensure the dashboard is secured
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: staging
+  metrics:
+    address: ":8082"
+
+http:
+  middlewares:
+    dashboard-auth:
+      basicAuth:
+        users:
+          - "admin:$apr1$l2EyNTmm$6mrVp.8A3i8wv.9.2qidU1"
+  routers:
+    api:
+      rule: "Host(`traefik.cv01.davidessien.com`)"
+      service: "api@internal"
+      entryPoints:
+        - websecure
+      middlewares:
+        - "dashboard-auth"
+
+providers:
+  docker:
+    exposedByDefault: false # Ensure only explicitly labeled containers are exposed
+
+certificatesResolvers:
+  staging:
+    acme:
+      email: davidessienshare@gmail.com
+      storage: /home/ec2-user/monitoring/letsencrypt/acme-staging.json
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: web
+  production:
+    acme:
+      email: davidessienshare@gmail.com
+      storage: /home/ec2-user/monitoring/letsencrypt/acme-production.json
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: web
+
+log:
+  level: DEBUG # Log level (DEBUG, INFO, WARN, ERROR)
+
+accessLog: # Enables access logging
+  filePath: /var/log/traefik/access.log
+  bufferingSize: 100 # Optional: Number of access logs to buffer before writing
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0

@@ -1,0 +1,24 @@
+# Ensure destination directory exists
+- name: Ensure root directory exists
+  file:
+    path: /home/ec2-user/monitoring
+    state: directory
+    mode: "0755"
+
+# Copy Docker Compose files
+- name: Copy Docker Compose files to root directory
+  copy:
+    src: "{{ item }}"
+    dest: "/home/ec2-user/monitoring/{{ item | basename }}"
+    mode: "0644"
+  with_fileglob:
+    - "{{ playbook_dir }}/files/docker-compose/*.yaml"
+
+# Copy configuration files (Prometheus, Loki, etc.)
+- name: Copy configuration files to root directory
+  copy:
+    src: "{{ item }}"
+    dest: "/home/ec2-user/monitoring/{{ item | basename }}"
+    mode: "0644"
+  with_fileglob:
+    - "{{ playbook_dir }}/files/config/*.yml"

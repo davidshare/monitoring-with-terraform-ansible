@@ -1,0 +1,30 @@
+services:
+  reverse-proxy:
+    image: traefik:v3.2.1
+    container_name: traefik
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    labels:
+      - traefik.enable=true
+
+      # HTTP Rule
+      - traefik.http.routers.dashboard-http.rule=Host(`traefik.cv01.davidessien.com`)
+      - traefik.http.routers.dashboard-http.entrypoints=web
+
+      # HTTPS Rule
+      - traefik.http.routers.dashboard-https.rule=Host(`traefik.cv01.davidessien.com`)
+      - traefik.http.routers.dashboard-https.entrypoints=websecure
+      - traefik.http.routers.dashboard-https.service=api@internal
+      - traefik.http.routers.dashboard-https.tls.certresolver=production
+
+      # Service port
+      - traefik.http.services.traefik-http.loadbalancer.server.port=8080
+    volumes:
+      - ./monitoring/traefik.yml:/etc/traefik/traefik.yml:ro # Traefik's main configuration file
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Access Docker socket
+      - ./letsencrypt:/letsencrypt # Persistent certificate storage
+    networks:
+      - apps
+      - monitoring

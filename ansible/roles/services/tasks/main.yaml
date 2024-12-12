@@ -1,0 +1,14 @@
+# Run Docker Compose Up
+- name: Bring up services with Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: /home/ec2-user/monitoring
+
+# Verify running containers
+- name: List running Docker containers
+  command: docker ps
+  register: docker_ps_output
+
+- name: Print running containers
+  debug:
+    msg: "{{ docker_ps_output.stdout_lines }}"
