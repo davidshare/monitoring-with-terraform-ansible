@@ -14,6 +14,7 @@ The project includes:
 ---
 
 ## **Project Structure**
+
 ```
 .
 ├── ansible/ # Configuration Management
@@ -61,6 +62,7 @@ The project includes:
 ## **Prerequisites**
 
 Ensure you have the following tools installed:
+
 1. **Terraform** (>= 1.0)
 2. **Ansible** (>= 2.12)
 3. **Docker** and **Docker Compose** (>= 2.0)
@@ -73,16 +75,19 @@ Ensure you have the following tools installed:
 ## **Deployment Instructions**
 
 ### **Step 1: Provision Cloud Infrastructure with Terraform**
+
 1. Navigate to the `terraform` directory:
    ```bash
    cd terraform
-  ```
+   ```
+
+````
 
 2. Initialize Terraform:
 
-   ```bash
-   terraform init
-   ```
+ ```bash
+ terraform init
+````
 
 3. Apply Terraform to provision resources:
    ```bash
@@ -222,10 +227,3 @@ This project is licensed under the MIT License.
 ## **Author**
 
 David Essien ([@davidessienshare](mailto:davidessienshare@gmail.com)).
-
----
-
-```
-
-This README is clear, organized, and includes everything a user would need to understand, deploy, and contribute to your project.
-```
